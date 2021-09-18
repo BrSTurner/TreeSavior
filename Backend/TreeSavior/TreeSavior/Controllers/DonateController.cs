@@ -3,17 +3,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TreeSavior.Data;
 using TreeSavior.ViewModels;
 
 namespace TreeSavior.Controllers
 {
     [ApiController]
-    [Route("api/[Controller]")]
+    [Route("api/[controller]")]
     public class DonateController : ControllerBase
     {
-        public DonateController()
+        private readonly MySqlContext _mySqlContext;
+        public DonateController(MySqlContext mySqlContext)
         {
-
+            _mySqlContext = mySqlContext;
         }
 
         [HttpPost]
@@ -56,6 +58,12 @@ namespace TreeSavior.Controllers
 
                 return BadRequest();
             }
+        }
+
+        [HttpGet]
+        public IActionResult GetStatus()
+        {
+            return Ok("API - Working");
         }
     }
 }

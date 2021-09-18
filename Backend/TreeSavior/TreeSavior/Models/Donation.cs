@@ -4,7 +4,7 @@ namespace TreeSavior.Models
 {
     public class Donation : Entity
     {
-        public Donator Donator { get; set; }
+        public virtual Donator Donator { get; set; }
         public int DonatorId { get; set; }
         public int Quantity { get; set; }
         public decimal Value { get; set; }
