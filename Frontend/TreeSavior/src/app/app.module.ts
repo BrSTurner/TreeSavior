@@ -15,7 +15,8 @@ import {MatSelectModule } from '@angular/material/select'
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatTableModule} from '@angular/material/table';
 import {MatPaginatorModule} from '@angular/material/paginator';
-import { NgxMaskModule, IConfig } from 'ngx-mask'
+import { NgxMaskModule, IConfig } from 'ngx-mask';
+import { HttpClientModule } from '@angular/common/http';
 
 export const options: Partial<IConfig> | (() => Partial<IConfig>) | any = null;
 
@@ -38,6 +39,7 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) | any = null;
     MatProgressSpinnerModule,
     MatTableModule,
     MatPaginatorModule,
+    HttpClientModule,
     NgxMaskModule.forRoot(),
   ],
   providers: [],

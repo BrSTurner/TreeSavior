@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { FormattedError } from '@angular/compiler';
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -5,32 +6,13 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatStepper } from '@angular/material/stepper';
 import { MatTableDataSource } from '@angular/material/table';
 import { PaymentViewModel } from './models/payment-view-model';
+import { TopDonator } from './models/top-donator';
 
 export interface ParcelElement {
   value: number;
   label: string;
   moneyValue: number;
 }
-
-export interface PeriodicElement {
-  name: string;
-  position: number;
-  donatedValue: string;
-  plantedTrees: number;
-}
-
-const ELEMENT_DATA: PeriodicElement[] = [
-  {position: 1, name: 'Bruno Silva', donatedValue: 'R$ 100', plantedTrees: 20},
-  {position: 2, name: 'Luis',donatedValue: 'R$ 100', plantedTrees: 20},
-  {position: 3, name: 'Mariane', donatedValue: 'R$ 100', plantedTrees: 20},
-  {position: 4, name: 'Hector', donatedValue: 'R$ 100', plantedTrees: 20},
-  {position: 5, name: 'Jéssica', donatedValue: 'R$ 100', plantedTrees: 20},
-  {position: 6, name: 'Barros', donatedValue: 'R$ 100', plantedTrees: 20},
-  {position: 7, name: 'Vinicius', donatedValue: 'R$ 100', plantedTrees: 20},
-  {position: 8, name: 'Lucas', donatedValue: 'R$ 100', plantedTrees: 20},
-  {position: 9, name: 'Leticia', donatedValue: 'R$ 100', plantedTrees: 20},
-  {position: 10, name: 'Felipe', donatedValue: 'R$ 100', plantedTrees: 20},
-];
 
 @Component({
   selector: 'app-root',
@@ -45,12 +27,14 @@ export class AppComponent implements OnInit, AfterViewInit  {
 
   firstFormGroup!: FormGroup;
   secondFormGroup!: FormGroup;
-  dataSource = new MatTableDataSource<PeriodicElement>(ELEMENT_DATA);
+  dataSource = new MatTableDataSource<TopDonator>([]);
   displayedColumns: string[] = ['position', 'name', 'donatedValue', 'plantedTrees'];
   totalAmount: number = 5;
   parcelOptions: ParcelElement[] = [];
+  runLoading = false;
 
-  constructor(private formBuilder: FormBuilder){
+  constructor(private formBuilder: FormBuilder,
+    private httpServer: HttpClient){
 
   }
 
@@ -79,6 +63,7 @@ export class AppComponent implements OnInit, AfterViewInit  {
     this.secondFormGroup.controls.totalValue.disable();
 
     this.setWatchers();
+    this.getTopDonators();
   }
 
   ngAfterViewInit() {
@@ -86,25 +71,55 @@ export class AppComponent implements OnInit, AfterViewInit  {
   }
 
   executePayment(){
+    this.runLoading = true;
+
     if(!this.firstFormGroup.valid || !this.secondFormGroup.valid){
+      this.runLoading = false;
       return;
     }
 
     const paymentViewModel = {
       name: this.firstFormGroup.controls.name.value,
       cpf: this.firstFormGroup.controls.cpf.value,
-      value: this.firstFormGroup.controls.value.value,
-      quantity: this.firstFormGroup.controls.quantity.value,
+      value: Number.parseFloat(this.firstFormGroup.controls.value.value),
+      quantity: Number.parseInt(this.firstFormGroup.controls.quantity.value),
       cardHolder: this.secondFormGroup.controls.cardName.value,
-      cardNumber: this.secondFormGroup.controls.cardNumber.value,
+      cardNumber: Number.parseInt(this.secondFormGroup.controls.cardNumber.value),
       cardExpirationDate: this.secondFormGroup.controls.cardValidDate.value,
-      cardParcels: this.secondFormGroup.controls.cardParcels.value,
-      cardSecurityCode: this.secondFormGroup.controls.cardCode.value,
+      cardParcels: Number.parseInt(this.secondFormGroup.controls.cardParcels.value),
+      cardSecurityCode: Number.parseInt(this.secondFormGroup.controls.cardCode.value),
       totalAmount: this.totalAmount
 
     } as PaymentViewModel
 
-    console.log(paymentViewModel);
+    this.httpServer.post("http://127.0.0.1:5555/api/donate/donate", paymentViewModel).subscribe((result) => {
+      this.getTopDonators();
+      this.runLoading = false;
+      this.stepper.reset();
+      this.resetForms();
+      alert("Doação realizada com sucesso!");
+    }, error =>{
+      this.runLoading = false;
+      this.stepper.reset();
+      this.resetForms();
+      alert("Ocorreu um erro durante o processo de Doação, tente novamente mais tarde");
+    });
+  }
+
+  resetForms(){
+    this.firstFormGroup.reset();
+    this.secondFormGroup.reset();
+    this.firstFormGroup.controls.value.setValue(5);
+    this.firstFormGroup.controls.quantity.setValue(1);
+    this.secondFormGroup.controls.cardParcels.setValue(1);
+  }
+
+  getTopDonators(){
+    this.httpServer.get<Array<TopDonator>>("http://127.0.0.1:5555/api/donate/gettopdonators").subscribe((result) => {
+      if(result && result.length > 0){
+        this.dataSource.data = result;
+      }
+    })
   }
 
   setWatchers(){

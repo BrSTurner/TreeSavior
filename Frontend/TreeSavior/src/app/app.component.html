@@ -42,7 +42,7 @@
 
     <div class="col w-100 mb-3">
       <h1 class="text-center" style="font-weight: bold;">Faça sua doação</h1>
-      <mat-vertical-stepper [linear]="false" #stepper class="w-100 shadow">
+      <mat-vertical-stepper [linear]="true" #stepper class="w-100 shadow">
         <mat-step [stepControl]="firstFormGroup">
           <form [formGroup]="firstFormGroup">
             <ng-template matStepLabel>Dados</ng-template>
@@ -125,7 +125,7 @@
         <mat-step>
           <ng-template matStepLabel>Processamento</ng-template>
           <div class="d-flex justify-content-center">
-            <mat-spinner class="mt-4 mb-4"></mat-spinner>
+            <mat-spinner class="mt-4 mb-4" *ngIf="runLoading"></mat-spinner>
           </div>
 
           <div>
