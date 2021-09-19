@@ -6,9 +6,7 @@ namespace TreeSavior.Data
 {
     public class MySqlContext : DbContext
     {
-        public DbSet<Donator> Donators { get; private set; }
-        public DbSet<Donation> Donations { get; private set; }
-        public MySqlContext(DbContextOptionsBuilder contextOptionsBuilder) : base(contextOptionsBuilder.Options)
+        public MySqlContext(DbContextOptions dbContextOptions) : base(dbContextOptions)
         {
             
         }
@@ -17,11 +15,14 @@ namespace TreeSavior.Data
         {
             base.OnModelCreating(modelBuilder);
 
+
+            modelBuilder.Entity<Donator>().ToTable("Donators");
             modelBuilder.Entity<Donator>().HasKey(x => x.Id);
             modelBuilder.Entity<Donator>().HasIndex(x => x.Id);
             modelBuilder.Entity<Donator>().Property(x => x.Name).IsRequired();
             modelBuilder.Entity<Donator>().Property(x => x.CPF).IsRequired();
 
+            modelBuilder.Entity<Donation>().ToTable("Donations");
             modelBuilder.Entity<Donation>().HasKey(x => x.Id);
             modelBuilder.Entity<Donation>().HasIndex(x => x.Id);
             modelBuilder.Entity<Donation>().Property(x => x.DonationDate).IsRequired().HasDefaultValue(DateTime.Now);
@@ -36,11 +37,7 @@ namespace TreeSavior.Data
                 .HasForeignKey(x => x.DonatorId)
                 .HasPrincipalKey(x => x.Id)
                 .OnDelete(DeleteBehavior.Cascade);
-
-            Donators = Set<Donator>();
-            Donations = Set<Donation>();
         }
-
 
     }
 }
