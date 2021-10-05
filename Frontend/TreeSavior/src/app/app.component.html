@@ -1,0 +1,141 @@
+
+<div class="container " style="overflow-y:hidden;" role="main">
+  <div class="text-center mt-5">
+    <span style="font-weight: bold; font-size: 100px;">TREE SAVIOR</span>
+    <h1 class="mt-3"  style="font-weight: bold;">DOE E SALVE O PLANETA</h1>
+    <span style="font-weight: 400;">Ajude a nossa causa fazendo uma doação, a cada R$ 5 doado uma árvore é plantada na Amazônia ou mata atlântica</span>
+  </div>
+  <div class="row mt-5">
+    <div class="col w-100">
+      <h1 class="text-center" style="font-weight: bold;">Top Doadores</h1>
+      <table mat-table [dataSource]="dataSource" class="mat-elevation-z8 w-100 shadow">
+
+        <!-- Position Column -->
+        <ng-container matColumnDef="position">
+          <th mat-header-cell *matHeaderCellDef> No. </th>
+          <td mat-cell *matCellDef="let element"> {{element.position}} </td>
+        </ng-container>
+
+        <!-- Name Column -->
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef> Nome </th>
+          <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+        </ng-container>
+
+        <!-- Weight Column -->
+        <ng-container matColumnDef="donatedValue">
+          <th mat-header-cell *matHeaderCellDef> Valor Doado </th>
+          <td mat-cell *matCellDef="let element"> {{element.donatedValue}} </td>
+        </ng-container>
+
+        <!-- Symbol Column -->
+        <ng-container matColumnDef="plantedTrees">
+          <th mat-header-cell *matHeaderCellDef> Ávores Plantadas </th>
+          <td mat-cell *matCellDef="let element"> {{element.plantedTrees}} </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+      <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+    </div>
+
+    <div class="col w-100 mb-3">
+      <h1 class="text-center" style="font-weight: bold;">Faça sua doação</h1>
+      <mat-vertical-stepper [linear]="true" #stepper class="w-100 shadow">
+        <mat-step [stepControl]="firstFormGroup">
+          <form [formGroup]="firstFormGroup">
+            <ng-template matStepLabel>Dados</ng-template>
+            <div class="row">
+              <mat-form-field class="col-sm">
+                <mat-label>Nome</mat-label>
+                <input matInput placeholder="Nome" formControlName="name" required>
+              </mat-form-field>
+
+              <mat-form-field class="col-sm">
+                <mat-label>CPF/CNPJ</mat-label>
+                <input matInput placeholder="CPF/CNPJ" formControlName="cpf" mask="CPF_CNPJ" required>
+              </mat-form-field>
+            </div>
+
+            <div class="row">
+              <mat-form-field class="col-sm">
+                <mat-label>Valor</mat-label>
+                <input matInput placeholder="Valor"  formControlName="value" required  [disabled]="true" >
+              </mat-form-field>
+
+              <mat-form-field class="col-sm">
+                <mat-label>Quantidade</mat-label>
+                <input matInput type="number" min="1" placeholder="Quantidade" formControlName="quantity" required>
+              </mat-form-field>
+            </div>
+
+            <div class="d-flex justify-content-end">
+              <button mat-button matStepperNext>Próximo</button>
+            </div>
+          </form>
+        </mat-step>
+        <mat-step [stepControl]="secondFormGroup">
+          <form [formGroup]="secondFormGroup">
+            <ng-template matStepLabel>Pagamento</ng-template>
+            <div class="row">
+              <mat-form-field class="col-sm">
+                <mat-label>Nome</mat-label>
+                <input matInput placeholder="Nome no cartão" formControlName="cardName" required>
+              </mat-form-field>
+
+              <mat-form-field class="col-sm">
+                <mat-label>Número Cartão</mat-label>
+                <input matInput placeholder="Número do Cartão" formControlName="cardNumber" mask="0000 0000 0000 0000" required>
+              </mat-form-field>
+            </div>
+
+            <div class="row">
+              <mat-form-field class="col-sm">
+                <mat-label>Validade</mat-label>
+                <input matInput placeholder="Validade do Cartão" formControlName="cardValidDate" mask="M0/0000" required >
+              </mat-form-field>
+
+              <mat-form-field class="col-sm">
+                <mat-label>Código</mat-label>
+                <input matInput type="number" placeholder="Código do Cartão" formControlName="cardCode" mask="000" required>
+              </mat-form-field>
+            </div>
+            <div class="row">
+              <mat-form-field class="col-sm">
+                <mat-label>Parcelas</mat-label>
+                <mat-select formControlName="cardParcels">
+                  <mat-option *ngFor="let parcel of parcelOptions" [value]="parcel.value">
+                    {{parcel.label + (parcel.moneyValue | currency:'BRL')}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field class="col-sm">
+                <mat-label>Total</mat-label>
+                <input matInput placeholder="Total" formControlName="totalValue" required [disabled]="true" >
+              </mat-form-field>
+            </div>
+            <div class="d-flex justify-content-between">
+              <button mat-button matStepperPrevious>Voltar</button>
+              <button matStepperNext class="btn btn-outline-success" (click)="executePayment()">Pagar</button>
+            </div>
+          </form>
+        </mat-step>
+        <mat-step>
+          <ng-template matStepLabel>Processamento</ng-template>
+          <div class="d-flex justify-content-center">
+            <mat-spinner class="mt-4 mb-4" *ngIf="runLoading"></mat-spinner>
+          </div>
+
+          <div>
+            <button mat-button matStepperPrevious>Voltar</button>
+            <!-- <button mat-button (click)="stepper.reset()">Reset</button> -->
+          </div>
+        </mat-step>
+      </mat-vertical-stepper>
+    </div>
+  </div>
+</div>
+
+<router-outlet></router-outlet>

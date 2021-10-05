@@ -1,0 +1,59 @@
+version: "3.8"
+services:
+ frontend:
+  image: treesavior-frontend
+  depends_on:
+   - haproxy
+  ports:
+   - "81:80"
+  networks:
+   - treesavior-network
+ 
+ api-savior-one:
+  image: treesavior
+  depends_on:
+   - db
+  build:
+   context: ./Backend/TreeSavior
+  ports:
+   - "20001:80"
+  networks:
+  - treesavior-network
+  
+ api-savior-two:
+  image: treesavior
+  depends_on:
+   - db
+  build:
+   context: ./Backend/TreeSavior
+  ports:
+   - "20002:80"
+  networks:
+  - treesavior-network
+
+ db:
+  image: mcr.microsoft.com/mssql/server:latest
+  container_name: db
+  restart: "always"
+  ports:
+   - "1433:1433"
+  environment:
+   - ACCEPT_EULA=Y
+   - SA_PASSWORD=Treesavior@2513
+
+ haproxy:
+  image: haproxy
+  volumes:
+   - ./haproxy:/haproxy-override
+   - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+  links:
+   - api-savior-one
+   - api-savior-two
+  ports:
+   - "80:80"
+   - "70:70"
+   
+networks: 
+ treesavior-network:
+  driver: bridge
+  
