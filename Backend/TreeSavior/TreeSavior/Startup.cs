@@ -49,7 +49,7 @@ namespace TreeSavior
                         .AllowAnyHeader());
             });
 
-            services.AddDbContext<MySqlContext>(options => options.UseInMemoryDatabase("TreeSavior"));
+            services.AddDbContext<MySqlContext>(options => options.UseSqlServer("Server=asgore.database.windows.net;Database=Treesavior;User Id=asgore;Password=Journey@159263;"));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
